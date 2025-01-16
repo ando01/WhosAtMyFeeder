@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, send_file, abort, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, send_file, abort, send_from_directory, Response, stream_with_context
 import sqlite3
 import base64
 from datetime import datetime, date
@@ -40,7 +40,7 @@ def frigate_thumbnail(frigate_event):
         response = requests.get(f'{frigate_url}/api/events/{frigate_event}/thumbnail.jpg', stream=True)
 
         if response.status_code == 200:
-            return send_file(response.raw, mimetype=response.headers['Content-Type'])
+            return send_file(response.raw, mimetype='image/jpeg')
         else:
             # Return the single transparent pixel image from the local file if the actual image is not found
             return send_from_directory('static/images', '1x1.png', mimetype='image/png')
@@ -59,7 +59,7 @@ def frigate_snapshot(frigate_event):
 
         if response.status_code == 200:
             # Serve the image to the client using Flask's send_file()
-            return send_file(response.raw, mimetype=response.headers['Content-Type'])
+            return send_file(response.raw, mimetype='image/jpeg')
         else:
             # Return the single transparent pixel image from the local file if the actual image is not found
             return send_from_directory('static/images', '1x1.png', mimetype='image/png')
@@ -75,16 +75,26 @@ def frigate_clip(frigate_event):
     try:
         # Fetch the clip from frigate
         print("Getting snapshot from Frigate", flush=True)
-        response = requests.get(f'{frigate_url}/api/events/{frigate_event}/clip.mp4', stream=True)
 
-        if response.status_code == 200:
-            # Serve the image to the client using Flask's send_file()
-            return send_file(response.raw, mimetype=response.headers['Content-Type'])
-        else:
-            # Return the single transparent pixel image from the local file if the actual image is not found
-            return send_from_directory('static/images', '1x1.png', mimetype='image/png')
+        # First request to get the content length
+        content_response = requests.get(f'{frigate_url}/api/events/{frigate_event}/clip.mp4', stream=True)
+        content_length = content_response.headers.get('Content-Length')
+
+        def generate():
+            response = requests.get(f'{frigate_url}/api/events/{frigate_event}/clip.mp4', stream=True)
+            for chunk in response.iter_content(chunk_size=8192):
+                if chunk:
+                    yield chunk
+        
+        headers = {
+            'Content-Type': 'video/mp4',
+            'Accept-Ranges': 'bytes',
+            'Content-Length': content_length
+        }
+        
+        return Response(stream_with_context(generate()), headers=headers)
+
     except Exception as e:
-        # If there's any issue fetching the image, return a 500 error
         print(f"Error fetching clip from frigate: {e}", flush=True)
         abort(500)
 
@@ -122,3 +132,7 @@ def load_config():
 
 
 load_config()
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
