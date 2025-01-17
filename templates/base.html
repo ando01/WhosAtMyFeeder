@@ -9,43 +9,26 @@
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    {% block head_extra %}{% endblock %}
     <style>
+        .navbar-nav {
+            margin: auto;
+        }
         .nav-link {
-            position: absolute;
-            top: 10px; /* Adjust this value as needed */
-            left: 48%; /* Move slightly to the left */
-            transform: translateX(-50%);
-            margin-right: 40px; /* Adding more margin-right to create space */
-            padding: 5px 10px; /* Add padding for the box */
-            border: 1px solid #ccc; /* Add a border around the home button */
-            border-radius: 5px; /* Optional: Add rounded corners */
-            background-color: #f8f9fa; /* Optional: Add background color */
+            font-weight: bold;
+            border: 1px solid black;
+            padding: 5px 10px;
         }
-
-        @media (max-width: 768px) {
-            .nav-link {
-                position: static;
-                transform: none;
-                margin-right: 0; /* Reset margin for smaller screens */
-                padding: 5px 10px; /* Ensure padding remains for smaller screens */
-                border: 1px solid #ccc; /* Ensure border remains for smaller screens */
-                border-radius: 5px; /* Ensure border-radius remains for smaller screens */
-                background-color: #f8f9fa; /* Ensure background color remains for smaller screens */
-            }
-        }
-
-        .date-picker-container {
-            margin-left: auto; /* Ensure date picker stays aligned to the right */
+        .navbar-text, .date-picker {
+            margin: auto;
         }
     </style>
+    {% block head_extra %}{% endblock %}
 </head>
 <body>
 
 <!-- Navigation -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/">Who's At My Feeder?</a>
+    <div class="container-fluid justify-content-center">
         {% if title_text %}
         <span class="navbar-text">
             {% if title_link %}
@@ -55,13 +38,13 @@
             {% endif %}
         </span>
         {% endif %}
-        <div class="d-flex">
+        <div class="d-flex align-items-center">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
                     <a class="nav-link" href="/">Home</a>
                 </li>
             </ul>
-            <div class="d-inline-block date-picker-container">
+            <div class="d-inline-block date-picker">
                 {% block date_picker %}{% endblock %}
             </div>
         </div>
@@ -79,7 +62,7 @@
 
 <footer class="bg-light text-center text-lg-start">
     <div class="text-center p-3">
-        Thanks for visting!
+        &copy; 2025 Who's At My Feeder
     </div>
 </footer>
 
