@@ -1,9 +1,10 @@
-version: "3.6"
+version: "3.8"
 services:
   whosatmyfeeder:
+    build: https://github.com/ando01/WhosAtMyFeeder.git
     container_name: whosatmyfeeder
     restart: unless-stopped
-    image: mmcc73/whosatmyfeeder:latest
+    image: whosatmyfeeder
     volumes:
       - ./config:/config
       - ./data:/data
